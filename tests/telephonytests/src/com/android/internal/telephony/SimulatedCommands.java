@@ -149,6 +149,8 @@ public class SimulatedCommands extends BaseCommands
     public int mDefaultRoamingIndicator;
     public int mReasonForDenial;
     public int mMaxDataCalls;
+    public boolean mSendSetGsmBroadcastConfigResponse = true;
+    public boolean mSendGetSmscAddressResponse = true;
 
     private SignalStrength mSignalStrength;
     private List<CellInfo> mCellInfoList = null;
@@ -168,6 +170,7 @@ public class SimulatedCommands extends BaseCommands
     private boolean mDcSuccess = true;
     private SetupDataCallResult mSetupDataCallResult;
     private boolean mIsRadioPowerFailResponse = false;
+    private String smscAddress;
 
     public boolean mSetRadioPowerForEmergencyCall;
     public boolean mSetRadioPowerAsSelectedPhoneForEmergencyCall;
@@ -1087,6 +1090,7 @@ public class SimulatedCommands extends BaseCommands
      */
     @Override
     public void startDtmf(char c, Message result) {
+        SimulatedCommandsVerifier.getInstance().startDtmf(c, result);
         resultSuccess(result, null);
     }
 
@@ -1246,12 +1250,18 @@ public class SimulatedCommands extends BaseCommands
 
     @Override
     public void getSmscAddress(Message result) {
-        unimplemented(result);
+        SimulatedCommandsVerifier.getInstance().getSmscAddress(result);
+        if (mSendGetSmscAddressResponse) {
+            unimplemented(result);
+        }
+        resultSuccess(result, smscAddress);
     }
 
     @Override
     public void setSmscAddress(String address, Message result) {
-        unimplemented(result);
+        smscAddress = address;
+        resultSuccess(result, null);
+        SimulatedCommandsVerifier.getInstance().setSmscAddress(address, result);
     }
 
     @Override
@@ -1867,7 +1877,10 @@ public class SimulatedCommands extends BaseCommands
 
     @Override
     public void setGsmBroadcastConfig(SmsBroadcastConfigInfo[] config, Message response) {
-        unimplemented(response);
+        SimulatedCommandsVerifier.getInstance().setGsmBroadcastConfig(config, response);
+        if (mSendSetGsmBroadcastConfigResponse) {
+            unimplemented(response);
+        }
     }
 
     @Override
